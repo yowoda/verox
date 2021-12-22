@@ -39,7 +39,7 @@ def parse_requirements_file(path):
 meta = parse_meta()
 
 setup(
-    name="hikari-verox",
+    name="verox-ipc",
     version=meta.version,
     description="An implementation of IPC using websockets.",
     long_description=long_description(),
