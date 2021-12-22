@@ -18,6 +18,7 @@ class BaseInterface:
     def uri(self):
         return f"ws://{self._host}:{self._port}"
 
+
 async def maybe_await(obj: t.Any, *args, **kwargs) -> t.Any:
     val = obj(*args, **kwargs)
     if inspect.iscoroutine(val):

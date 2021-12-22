@@ -5,11 +5,13 @@ import aiohttp
 
 from verox import BaseInterface
 
+__all__ = ["Client"]
+
 _LOGGER = logging.getLogger(__name__)
 
 
 class Client(BaseInterface):
-    __slots__ = ("_websocket", )
+    __slots__ = ("_websocket",)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
