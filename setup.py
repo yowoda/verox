@@ -46,7 +46,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Yoda",
     author_email="yodarlswitch@gmail.com",
-    url="https://github.com/YodaPY/hikari-verox",
+    url="https://github.com/YodaPY/verox-ipc",
     packages=find_namespace_packages(include=[name + "*"]),
     include_package_data=True,
     zip_safe=False,
