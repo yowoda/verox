@@ -37,7 +37,6 @@ async def home() -> str:
 @app.route("/login")
 async def login():
     redirect_url = get_redirect_url(state=session["state"])
-    print(redirect_url)
 
     return redirect(redirect_url)
 
