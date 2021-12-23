@@ -6,20 +6,11 @@ import typing as t
 
 import aiohttp
 
-from verox import BaseInterface, maybe_await
+from verox.base import BaseInterface, maybe_await
 
 __all__ = ["endpoint", "Data", "Server"]
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def endpoint(name: str = None):
-    def decorator(func):
-        Server.ENDPOINTS[name or func.__name__] = func
-
-        return func
-
-    return decorator
 
 
 class Data:
@@ -27,16 +18,29 @@ class Data:
         self.payload = payload
         self.endpoint: str = payload["endpoint"]
 
-        for key, value in payload["data"].items():
-            setattr(self, key, value)
+        self.__dict__.update(payload["data"])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Data({self.payload['data']})"
+
+
+EndpointCallbackT = t.TypeVar("EndpointCallbackT", bound=t.Callable[[Data], t.Any])
+
+
+def endpoint(
+    name: t.Optional[str] = None,
+) -> t.Callable[[EndpointCallbackT], EndpointCallbackT]:
+    def decorator(func: EndpointCallbackT) -> EndpointCallbackT:
+        Server.ENDPOINTS[name or func.__name__] = func
+
+        return func
+
+    return decorator
 
 
 class Server(BaseInterface):
     __slots__ = ()
-    ENDPOINTS: dict[str, t.Coroutine] = {}
+    ENDPOINTS: dict[str, EndpointCallbackT] = {}
 
     async def handle_request(self, request: aiohttp.web_request.Request) -> None:
         websocket = aiohttp.web.WebSocketResponse()
@@ -52,11 +56,11 @@ class Server(BaseInterface):
 
             if endpoint not in self.ENDPOINTS:
                 response = {"error": "Requested endpoint not found.", "code": 404}
-                _LOGGER.info(response["error"])
+                _LOGGER.error(response["error"])
 
             elif not headers or headers.get("Authorization") != self._secret_key:
                 response = {"error": "Authorization failed.", "code": 403}
-                _LOGGER.info(response["error"])
+                _LOGGER.error(response["error"])
 
             else:
                 data = Data(payload)
@@ -73,7 +77,7 @@ class Server(BaseInterface):
         site = aiohttp.web.TCPSite(runner, self._host, self._port)
         await site.start()
 
-    def start(self):
+    def start(self) -> None:
         app = aiohttp.web.Application()
         app.router.add_route("GET", "/", self.handle_request)
 

@@ -35,6 +35,7 @@ pip-wheel-metadata/
 # Test files
 test_client.py
 test_server.py
+.env
 
 # Stupid OSX files
 .DS_Store

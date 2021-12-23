@@ -2,6 +2,8 @@ import asyncio
 import inspect
 import typing as t
 
+__all__ = ["BaseInterface", "maybe_await"]
+
 
 class BaseInterface:
     __slots__ = ("_secret_key", "_loop", "_host", "_port")
@@ -15,11 +17,11 @@ class BaseInterface:
         self._port = port
 
     @property
-    def uri(self):
+    def uri(self) -> str:
         return f"ws://{self._host}:{self._port}"
 
 
-async def maybe_await(obj: t.Any, *args, **kwargs) -> t.Any:
+async def maybe_await(obj: t.Any, *args: t.Any, **kwargs: t.Any) -> t.Any:
     val = obj(*args, **kwargs)
     if inspect.iscoroutine(val):
         val = await val

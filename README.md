@@ -12,7 +12,7 @@ pip install git+https://github.com/YodaPY/hikari-verox
 
 Verox is split into client-side and server-side. The client-side is usually the web app, the server-side is the bot.
 
-The following example uses [quart](https://github.com/pgjones/quart) and [hikari](https://github.com/hikari-py/hikari)
+The following example uses [quart](https://github.com/pgjones/quart) and [hikari](https://github.com/hikari-py/hikari):
 
 `webapp.py`
 ```py
@@ -23,7 +23,7 @@ app = Quart(__name__)
 client = Client("your_secret_key")
 
 @app.route("/")
-async def lol():
+async def home():
     count = await client.request("guild_member_count", guild_id=1234567890)
     return str(count)
 
@@ -46,3 +46,5 @@ async def guild_member_count(data):
 server.start()
 bot.run()
 ```
+
+For more advanced examples, please take a look at [examples/mutual_guilds](examples/mutual_guilds) and its [README](examples/mutual_guilds/README.md).

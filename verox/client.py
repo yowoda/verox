@@ -3,7 +3,7 @@ import typing as t
 
 import aiohttp
 
-from verox import BaseInterface
+from verox.base import BaseInterface
 
 __all__ = ["Client"]
 
@@ -13,10 +13,10 @@ _LOGGER = logging.getLogger(__name__)
 class Client(BaseInterface):
     __slots__ = ("_websocket",)
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self._websocket = None
+        self._websocket: t.Optional[aiohttp.ClientWebSocketResponse] = None
 
     async def init_socket(self) -> None:
         _LOGGER.info("Initializing Websocket Connection")
