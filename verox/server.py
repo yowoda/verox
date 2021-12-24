@@ -6,41 +6,33 @@ import typing as t
 
 import aiohttp
 
-from verox.base import BaseInterface, maybe_await
+from verox.base import *
 
 __all__ = ["endpoint", "Data", "Server"]
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Data:
-    def __init__(self, payload: dict[str, t.Any]) -> None:
-        self.payload = payload
-        self.endpoint: str = payload["endpoint"]
-
-        self.__dict__.update(payload["data"])
-
-    def __repr__(self) -> str:
-        return f"Data({self.payload['data']})"
-
-
-EndpointCallbackT = t.TypeVar("EndpointCallbackT", bound=t.Callable[[Data], t.Any])
-
-
 def endpoint(
-    name: t.Optional[str] = None,
+    name: t.Optional[str] = None, **context
 ) -> t.Callable[[EndpointCallbackT], EndpointCallbackT]:
     def decorator(func: EndpointCallbackT) -> EndpointCallbackT:
-        Server.ENDPOINTS[name or func.__name__] = func
+        add_endpoint(func, name, context=context)
 
         return func
 
     return decorator
 
 
+def add_endpoint(
+    func: EndpointCallbackT, name: t.Optional[str] = None, **context
+) -> None:
+    Server.ENDPOINTS[name or func.__name__] = Endpoint(func, Context(context=context))
+
+
 class Server(BaseInterface):
     __slots__ = ()
-    ENDPOINTS: dict[str, EndpointCallbackT] = {}
+    ENDPOINTS: dict[str, Endpoint] = {}
 
     async def handle_request(self, request: aiohttp.web_request.Request) -> None:
         websocket = aiohttp.web.WebSocketResponse()
@@ -51,10 +43,10 @@ class Server(BaseInterface):
 
             _LOGGER.debug("IPC Server < %r", payload)
 
-            endpoint = payload.get("endpoint")
+            endpoint_name = payload.get("endpoint")
             headers = payload.get("headers")
 
-            if endpoint not in self.ENDPOINTS:
+            if endpoint_name not in self.ENDPOINTS:
                 response = {"error": "Requested endpoint not found.", "code": 404}
                 _LOGGER.error(response["error"])
 
@@ -63,9 +55,9 @@ class Server(BaseInterface):
                 _LOGGER.error(response["error"])
 
             else:
-                data = Data(payload)
-                callback = self.ENDPOINTS[endpoint]
-                response = await maybe_await(callback, data)
+                endpoint = self.ENDPOINTS[endpoint_name]
+                endpoint.context.data = Data(payload)
+                response = await maybe_await(endpoint.callback, endpoint.context)
 
             await websocket.send_json(response)
             _LOGGER.debug("IPC Server > %r", response)

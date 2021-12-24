@@ -2,7 +2,16 @@ import asyncio
 import inspect
 import typing as t
 
-__all__ = ["BaseInterface", "maybe_await"]
+import attr
+
+__all__ = [
+    "BaseInterface",
+    "Context",
+    "EndpointCallbackT",
+    "Endpoint",
+    "Data",
+    "maybe_await",
+]
 
 
 class BaseInterface:
@@ -19,6 +28,31 @@ class BaseInterface:
     @property
     def uri(self) -> str:
         return f"ws://{self._host}:{self._port}"
+
+
+class Context:
+    def __init__(self, **kwargs) -> None:
+        self.__dict__.update(kwargs)
+
+
+EndpointCallbackT = t.TypeVar("EndpointCallbackT", bound=t.Callable[[Context], t.Any])
+
+
+@attr.s(slots=True)
+class Endpoint:
+    callback: EndpointCallbackT = attr.ib()
+    context: Context = attr.ib()
+
+
+class Data:
+    def __init__(self, payload: dict[str, t.Any]) -> None:
+        self.payload = payload
+        self.endpoint: str = payload["endpoint"]
+
+        self.__dict__.update(payload["data"])
+
+    def __repr__(self) -> str:
+        return f"Data({self.payload['data']})"
 
 
 async def maybe_await(obj: t.Any, *args: t.Any, **kwargs: t.Any) -> t.Any:

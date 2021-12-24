@@ -47,4 +47,4 @@ server.start()
 bot.run()
 ```
 
-For more advanced examples, please take a look at [examples/mutual_guilds](examples/mutual_guilds) and its [README](examples/mutual_guilds/README.md).
+For more advanced examples, please take a look at [examples](examples) and its README

@@ -6,7 +6,7 @@ import hikari
 from quart import Quart, redirect, request, session, url_for
 from verox import Client
 
-from dashboard.http import *
+from examples.mutual_guilds.dashboard.http import *
 
 app = Quart(__name__)
 app.secret_key = os.environ["APP_SECRET"]
