@@ -8,7 +8,7 @@ import aiohttp
 
 from verox.base import *
 
-__all__ = ["endpoint", "Data", "Server"]
+__all__ = ["endpoint", "add_endpoint", "Server"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def endpoint(
 def add_endpoint(
     func: EndpointCallbackT, name: t.Optional[str] = None, **context
 ) -> None:
-    Server.ENDPOINTS[name or func.__name__] = Endpoint(func, Context(context=context))
+    Server.ENDPOINTS[name or func.__name__] = Endpoint(func, Context(**context))
 
 
 class Server(BaseInterface):
