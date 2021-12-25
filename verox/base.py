@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import inspect
 import typing as t
@@ -24,6 +26,12 @@ class BaseInterface:
         self._loop = asyncio.get_event_loop()
         self._host = host
         self._port = port
+
+    def __new__(cls, *args, **kwargs) -> t.Union[t.NoReturn, BaseInterface]:
+        if cls is BaseInterface:
+            raise TypeError(f"Can't instantiate {cls.__name__} directly.")
+
+        return super().__new__(cls)
 
     @property
     def uri(self) -> str:

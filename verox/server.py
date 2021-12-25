@@ -17,7 +17,7 @@ def endpoint(
     name: t.Optional[str] = None, **context
 ) -> t.Callable[[EndpointCallbackT], EndpointCallbackT]:
     def decorator(func: EndpointCallbackT) -> EndpointCallbackT:
-        add_endpoint(func, name, context=context)
+        add_endpoint(func, name, **context)
 
         return func
 

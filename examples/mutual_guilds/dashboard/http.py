@@ -1,6 +1,6 @@
 import aiohttp
 
-from examples.mutual_guilds.dashboard.config import *
+from dashboard.config import *
 
 __all__ = ["get_redirect_url", "get_user_token"]
 

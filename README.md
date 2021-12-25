@@ -33,15 +33,14 @@ app.run(debug=True)
 `bot.py`
 ```py
 import hikari
-
-from verox import Server, endpoint
+import verox
 
 bot = hikari.GatewayBot(token="your_token", intents=hikari.Intents.GUILD_MEMBERS)
-server = Server("your_secret_key") #must match the secret key of your client
+server = verox.Server("your_secret_key") #must match the secret key of your client
 
-@endpoint()
-async def guild_member_count(data):
-    return len(bot.cache.get_members_view_for_guild(data.guild_id))
+@verox.endpoint()
+async def guild_member_count(context: verox.Context):
+    return len(bot.cache.get_members_view_for_guild(context.data.guild_id))
 
 server.start()
 bot.run()

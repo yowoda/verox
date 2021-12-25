@@ -4,13 +4,13 @@ from secrets import token_urlsafe
 
 import hikari
 from quart import Quart, redirect, request, session, url_for
-from verox import Client
+import verox
 
-from examples.mutual_guilds.dashboard.http import *
+from dashboard.http import *
 
 app = Quart(__name__)
 app.secret_key = os.environ["APP_SECRET"]
-client = Client(os.environ["APP_SECRET"])
+client = verox.Client(os.environ["APP_SECRET"])
 rest = hikari.RESTApp()
 
 

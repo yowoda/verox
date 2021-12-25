@@ -5,4 +5,4 @@ from verox.server import *
 
 __all__ = [*client.__all__, *server.__all__]
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
