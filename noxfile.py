@@ -2,13 +2,18 @@ import nox
 
 SCRIPT_PATHS = [
     "verox",
-    "examples"
+    "examples",
+    "tests"
 ]
 
 @nox.session(python=False)
 def requirements(session):
     session.run("pip", "install", "-Ur", "requirements.txt")
     session.run("pip", "install", "-Ur", "dev-requirements.txt")
+
+@nox.session(python=False)
+def tests(session):
+    session.run("python3", "-m", "pytest", "tests")
 
 @nox.session(python=False)
 def formatting(session):
