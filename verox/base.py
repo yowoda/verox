@@ -4,7 +4,6 @@ import asyncio
 import inspect
 import typing as t
 
-import aiohttp
 import attr
 
 from verox.ux import init_logger
@@ -28,13 +27,12 @@ class BaseInterface:
         host: str = "localhost",
         port: int = 8080,
         *,
-        logs: t.Optional[t.Union[str, int, dict[str, t.Any]]] = "DEBUG",
+        logs: t.Optional[t.Union[str, int, dict[str, t.Any]]] = "INFO",
     ) -> None:
         self._secret_key = secret_key
         self._host = host
         self._port = port
         self._loop = asyncio.get_event_loop()
-        self._session = aiohttp.ClientSession()
 
         if logs is not None:
             init_logger(logs)

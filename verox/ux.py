@@ -3,8 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-if t.TYPE_CHECKING:
-    import aiohttp
+import aiohttp
 
 __all__ = ["init_logger", "check_for_updates"]
 
@@ -37,13 +36,13 @@ def init_logger(config: t.Union[str, int, dict[str, t.Any]]):
         logging.basicConfig(level=config, handlers=[handler])
 
 
-async def check_for_updates(session: aiohttp.ClientSession):
+async def check_for_updates():
     from packaging import version
 
     from verox._about import __version__
 
     try:
-        async with session.get("https://pypi.org/pypi/verox/json") as resp:
+        async with aiohttp.request("GET", "https://pypi.org/pypi/verox/json") as resp:
             data = await resp.json()
 
         newest_version = version.parse(data["info"]["version"])

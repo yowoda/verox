@@ -20,8 +20,8 @@ class Client(BaseInterface):
 
     async def init_socket(self) -> None:
         _LOGGER.info("Initializing Websocket Connection")
-
-        self._websocket = await self._session.ws_connect(self.uri)
+        session = aiohttp.ClientSession()
+        self._websocket = await session.ws_connect(self.uri)
         _LOGGER.info("Connected to %s", self.uri)
 
     async def request(self, endpoint: str, **kwargs: t.Any) -> t.Any:

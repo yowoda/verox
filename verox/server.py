@@ -71,7 +71,7 @@ class Server(BaseInterface):
 
     async def _start_servers(self, app: aiohttp.web.Application) -> None:
         if self._check_for_updates is True:
-            await check_for_updates(self._session)
+            await check_for_updates()
 
         runner = aiohttp.web.AppRunner(app)
         await runner.setup()
