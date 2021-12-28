@@ -5,7 +5,7 @@ While it's aimed at the hikari community, it does not depend on it at all which 
 
 ## Installation
 ```
-pip install git+https://github.com/YodaPY/hikari-verox
+pip install verox
 ```
 
 ## Usage

@@ -3,8 +3,8 @@ import os
 from secrets import token_urlsafe
 
 import hikari
-from quart import Quart, redirect, request, session, url_for
 import verox
+from quart import Quart, redirect, request, session, url_for
 
 from dashboard.http import *
 

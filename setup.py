@@ -9,7 +9,7 @@ name = "verox"
 
 
 def parse_meta():
-    with open(os.path.join(name, "__init__.py")) as fp:
+    with open(os.path.join(name, "_about.py")) as fp:
         code = fp.read()
 
     token_pattern = re.compile(r"^__(?P<key>\w+)?__\s*=\s*(?P<quote>(?:'{3}|\"{3}|'|\"))(?P<value>.*?)(?P=quote)", re.M)
@@ -37,15 +37,16 @@ def parse_requirements_file(path):
 meta = parse_meta()
 
 setup(
-    name="verox-ipc",
+    name="verox",
     version=meta.version,
     description="An implementation of IPC using websockets.",
     long_description=long_description(),
     long_description_content_type="text/markdown",
-    author="Yoda",
-    author_email="yodarlswitch@gmail.com",
-    url="https://github.com/YodaPY/verox-ipc",
+    author=meta.author,
+    author_email=meta.email,
+    url=meta.url,
     packages=find_namespace_packages(include=[name + "*"]),
+    license=meta.license,
     include_package_data=True,
     zip_safe=False,
     install_requires=parse_requirements_file("requirements.txt"),

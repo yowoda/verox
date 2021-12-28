@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import inspect
 import logging
 import typing as t
@@ -7,6 +8,7 @@ import typing as t
 import aiohttp
 
 from verox.base import *
+from verox.ux import check_for_updates
 
 __all__ = ["endpoint", "add_endpoint", "Server"]
 
@@ -31,8 +33,13 @@ def add_endpoint(
 
 
 class Server(BaseInterface):
-    __slots__ = ()
+    __slots__ = "_check_for_updates"
     ENDPOINTS: dict[str, Endpoint] = {}
+
+    def __init__(self, *args, check_for_updates: bool = True, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self._check_for_updates = check_for_updates
 
     async def handle_request(self, request: aiohttp.web_request.Request) -> None:
         websocket = aiohttp.web.WebSocketResponse()
@@ -41,7 +48,7 @@ class Server(BaseInterface):
         async for message in websocket:
             payload = message.json()
 
-            _LOGGER.debug("IPC Server < %r", payload)
+            _LOGGER.debug("IPC Server received %r", payload)
 
             endpoint_name = payload.get("endpoint")
             headers = payload.get("headers")
@@ -60,9 +67,12 @@ class Server(BaseInterface):
                 response = await maybe_await(endpoint.callback, endpoint.context)
 
             await websocket.send_json(response)
-            _LOGGER.debug("IPC Server > %r", response)
+            _LOGGER.debug("IPC Server sent %r back", response)
 
     async def _start_servers(self, app: aiohttp.web.Application) -> None:
+        if self._check_for_updates is True:
+            await check_for_updates(self._session)
+
         runner = aiohttp.web.AppRunner(app)
         await runner.setup()
 

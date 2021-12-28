@@ -1,6 +1,7 @@
 # Python cached sources
 __pycache__/
 *.pyc
+.pytest_cache
 
 # Virtual environments
 .venv*/
