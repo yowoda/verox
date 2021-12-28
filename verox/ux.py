@@ -63,6 +63,7 @@ async def check_for_updates():
                     "-m",
                     "pip",
                     "install",
+                    "-U",
                     f"verox=={newest_version}",
                 )
                 subprocess.run(args)
