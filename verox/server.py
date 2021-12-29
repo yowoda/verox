@@ -33,13 +33,18 @@ def add_endpoint(
 
 
 class Server(BaseInterface):
-    __slots__ = "_check_for_updates"
+    __slots__ = ("_check_for_updates", "_started", "_runner", "_site", "_app")
+
     ENDPOINTS: dict[str, Endpoint] = {}
 
     def __init__(self, *args, check_for_updates: bool = True, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._check_for_updates = check_for_updates
+        self._started = False
+        self._runner: t.Optional[aiohttp.web.AppRunner] = None
+        self._site: t.Optional[aiohttp.web.TCPSite] = None
+        self._app: t.Optional[aiohttp.web.Application] = None
 
     async def handle_request(self, request: aiohttp.web_request.Request) -> None:
         websocket = aiohttp.web.WebSocketResponse()
@@ -73,14 +78,29 @@ class Server(BaseInterface):
         if self._check_for_updates is True:
             await check_for_updates()
 
-        runner = aiohttp.web.AppRunner(app)
-        await runner.setup()
+        self._runner = aiohttp.web.AppRunner(app)
+        await self._runner.setup()
 
-        site = aiohttp.web.TCPSite(runner, self._host, self._port)
-        await site.start()
+        self._site = aiohttp.web.TCPSite(self._runner, self._host, self._port)
+        await self._site.start()
+
+        self._started = True
 
     def start(self) -> None:
-        app = aiohttp.web.Application()
-        app.router.add_route("GET", "/", self.handle_request)
+        self._app = aiohttp.web.Application()
+        self._app.router.add_route("GET", "/", self.handle_request)
 
-        self._loop.run_until_complete(self._start_servers(app))
+        self._loop.run_until_complete(self._start_servers(self._app))
+
+        _LOGGER.info("Successfully started the IPC server.")
+
+    async def close(self) -> None:
+        if self._started is False:
+            raise RuntimeError("The IPC server never started.")
+
+        await self._site.stop()
+        await self._runner.cleanup()
+        await self._app.shutdown()
+        await self._app.cleanup()
+
+        _LOGGER.info("Successfully shut down.")

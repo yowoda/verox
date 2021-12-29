@@ -1,3 +1,5 @@
+[![PyPI](https://img.shields.io/pypi/v/verox)](https://pypi.org/project/verox)
+
 # Verox
 Verox (inspired by [discord-ext-ipc](https://github.com/Ext-Creators/discord-ext-ipc)) is an implementation of [IPC](https://en.wikipedia.org/wiki/Inter-process_communication) using websockets.
 It's designed to make dashboard development a lot easier and quicker.
@@ -27,6 +29,10 @@ async def home():
     count = await client.request("guild_member_count", guild_id=1234567890)
     return str(count)
 
+@app.after_serving
+async def close_client():
+    await client.close()
+
 app.run(debug=True)
 ```
 
@@ -35,12 +41,16 @@ app.run(debug=True)
 import hikari
 import verox
 
-bot = hikari.GatewayBot(token="your_token", intents=hikari.Intents.GUILD_MEMBERS)
+bot = hikari.GatewayBot(token="your_token", intents=hikari.Intents.ALL)
 server = verox.Server("your_secret_key") #must match the secret key of your client
 
 @verox.endpoint()
 async def guild_member_count(context: verox.Context):
     return len(bot.cache.get_members_view_for_guild(context.data.guild_id))
+
+@bot.listen()
+async def close_server(event: hikari.StoppingEvent):
+    await server.close()
 
 server.start()
 bot.run()

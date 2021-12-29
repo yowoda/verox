@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import asyncio
 import inspect
 import typing as t
@@ -18,7 +19,7 @@ __all__ = [
 ]
 
 
-class BaseInterface:
+class BaseInterface(abc.ABC):
     __slots__ = ("_secret_key", "_host", "_port", "_loop", "_session")
 
     def __init__(
@@ -37,11 +38,9 @@ class BaseInterface:
         if logs is not None:
             init_logger(logs)
 
-    def __new__(cls, *args, **kwargs) -> t.Union[t.NoReturn, BaseInterface]:
-        if cls is BaseInterface:
-            raise TypeError(f"Can't instantiate {cls.__name__} directly.")
-
-        return super().__new__(cls)
+    @abc.abstractmethod
+    async def close(self):
+        raise NotImplementedError
 
     @property
     def uri(self) -> str:

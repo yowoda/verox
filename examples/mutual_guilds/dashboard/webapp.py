@@ -55,5 +55,10 @@ async def callback():
     return redirect(url_for("home"))
 
 
+@app.after_serving
+async def close_client():
+    await client.close()
+
+
 def run():
     app.run(debug=True)

@@ -4,7 +4,8 @@ import verox
 
 
 class MockBaseInterface(verox.BaseInterface):
-    pass
+    async def close(self):
+        ...
 
 
 class TestBaseInterface:
