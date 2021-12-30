@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import functools
-import inspect
 import logging
 import typing as t
 
-import aiohttp
+from aiohttp import web
 
 from verox.base import *
 from verox.ux import check_for_updates
@@ -42,12 +40,12 @@ class Server(BaseInterface):
 
         self._check_for_updates = check_for_updates
         self._started = False
-        self._runner: t.Optional[aiohttp.web.AppRunner] = None
-        self._site: t.Optional[aiohttp.web.TCPSite] = None
-        self._app: t.Optional[aiohttp.web.Application] = None
+        self._runner: t.Optional[web.AppRunner] = None
+        self._site: t.Optional[web.TCPSite] = None
+        self._app: t.Optional[web.Application] = None
 
-    async def handle_request(self, request: aiohttp.web_request.Request) -> None:
-        websocket = aiohttp.web.WebSocketResponse()
+    async def handle_request(self, request: web.Request) -> None:
+        websocket = web.WebSocketResponse()
         await websocket.prepare(request)
 
         async for message in websocket:
@@ -74,20 +72,20 @@ class Server(BaseInterface):
             await websocket.send_json(response)
             _LOGGER.debug("IPC Server sent %r back", response)
 
-    async def _start_servers(self, app: aiohttp.web.Application) -> None:
+    async def _start_servers(self, app: web.Application) -> None:
         if self._check_for_updates is True:
             await check_for_updates()
 
-        self._runner = aiohttp.web.AppRunner(app)
+        self._runner = web.AppRunner(app)
         await self._runner.setup()
 
-        self._site = aiohttp.web.TCPSite(self._runner, self._host, self._port)
+        self._site = web.TCPSite(self._runner, self._host, self._port)
         await self._site.start()
 
         self._started = True
 
     def start(self) -> None:
-        self._app = aiohttp.web.Application()
+        self._app = web.Application()
         self._app.router.add_route("GET", "/", self.handle_request)
 
         self._loop.run_until_complete(self._start_servers(self._app))
