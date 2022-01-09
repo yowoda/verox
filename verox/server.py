@@ -54,13 +54,13 @@ class Server(BaseInterface):
             _LOGGER.debug("IPC Server received %r", payload)
 
             endpoint_name = payload.get("endpoint")
-            headers = payload.get("headers")
+            headers = payload.get("headers", {})
 
             if endpoint_name not in self.ENDPOINTS:
                 response = {"error": "Requested endpoint not found.", "code": 404}
                 _LOGGER.error(response["error"])
 
-            elif not headers or headers.get("Authorization") != self._secret_key:
+            elif headers.get("Authorization") != self._secret_key:
                 response = {"error": "Authorization failed.", "code": 403}
                 _LOGGER.error(response["error"])
 

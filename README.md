@@ -1,4 +1,6 @@
 [![PyPI](https://img.shields.io/pypi/v/verox)](https://pypi.org/project/verox)
+![Maintenance](https://img.shields.io/maintenance/yes/2022)
+![Code Style](https://img.shields.io/badge/code%20style-black-black)
 
 # Verox
 Verox (inspired by [discord-ext-ipc](https://github.com/Ext-Creators/discord-ext-ipc)) is an implementation of [IPC](https://en.wikipedia.org/wiki/Inter-process_communication) using websockets.
@@ -9,6 +11,23 @@ While it's aimed at the hikari community, it does not depend on it at all which 
 ```
 pip install verox
 ```
+<details>
+<summary>
+    Didn't work?
+</summary>
+
+- `pip` is not in `PATH`
+    ```sh
+    python -m pip install verox
+    ```
+
+- Check if the path of your python executable matches the path of the interpreter you run your code with<br>
+    In UNIX-like systems:
+    ```sh
+    which python
+    ```
+
+</details>
 
 ## Usage
 
